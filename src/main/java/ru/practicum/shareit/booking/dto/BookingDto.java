@@ -1,22 +1,21 @@
 package ru.practicum.shareit.booking.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.booking.model.Status;
+import lombok.*;
 
-@NoArgsConstructor
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @Builder
-@Data
 public class BookingDto {
     private Long id;
-    private LocalDate start;
-    private LocalDate end;
-    private Long item;
-    private Long booker;
-    private Status status;
+    @ManyToOne
+    @JoinColumn(name = "booker_id")
+    private Long bookerId;
+    private LocalDateTime start;
+    private LocalDateTime end;
 }

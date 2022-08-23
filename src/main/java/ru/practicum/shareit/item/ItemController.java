@@ -3,6 +3,9 @@ package ru.practicum.shareit.item;
 import java.util.List;
 import javax.validation.Valid;
 
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
+import ru.practicum.shareit.item.dto.ItemDtoWithComments;
 import ru.practicum.shareit.item.service.ItemService;
 
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -31,17 +34,23 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findById(@PathVariable long itemId) {
-        return itemService.findById(itemId);
+    public ItemDtoWithComments findById(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
+        return itemService.findById(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> findByOwner(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoWithBookings> findByOwner(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.findByOwner(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> findByText(@RequestParam(value = "text") String text) {
-        return itemService.findByText(text);
+    public List<ItemDto> searchText(@RequestParam(value = "text") String text) {
+        return itemService.searchText(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto makeComment(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody CommentDto commentDto,
+                                  @PathVariable long itemId) {
+        return itemService.createComment(commentDto, userId, itemId);
     }
 }
