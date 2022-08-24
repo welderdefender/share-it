@@ -18,6 +18,7 @@ import javax.persistence.*;
 @Builder
 @Data
 @Entity
+@Table(name = "booking")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
