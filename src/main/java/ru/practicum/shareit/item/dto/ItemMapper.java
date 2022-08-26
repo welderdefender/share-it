@@ -1,7 +1,10 @@
 package ru.practicum.shareit.item.dto;
 
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.item.model.Item;
+
+import java.util.List;
 
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
@@ -21,6 +24,32 @@ public class ItemMapper {
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .owner(user)
+                .build();
+    }
+
+    public static ItemDtoWithBookings toItemDtoWithBookings(Item item, BookingDto last, BookingDto next) {
+        return ItemDtoWithBookings.builder()
+                .id(item.getId())
+                .owner(item.getOwner().getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .nextBooking(next)
+                .lastBooking(last)
+                .build();
+    }
+
+    public static ItemDtoWithComments toItemDtoWithComments(Item item, BookingDto last, BookingDto next,
+                                                            List<CommentDto> comment) {
+        return ItemDtoWithComments.builder()
+                .id(item.getId())
+                .owner(item.getOwner().getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .lastBooking(last)
+                .nextBooking(next)
+                .comments(comment)
                 .build();
     }
 }
