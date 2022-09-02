@@ -40,14 +40,24 @@ public class BookingController {
     public List<BookingFinishDto> findBookingsByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                                       @RequestParam(value = "state", required = false, defaultValue =
                                                               "ALL")
-                                                              String state) {
-        return bookingService.findBookingsByOwner(userId, state);
+                                                              String state,
+                                                      @RequestParam(value = "from", required = false, defaultValue =
+                                                              "0")
+                                                              int from,
+                                                      @RequestParam(value = "size", required = false, defaultValue =
+                                                              "10")
+                                                              int size) {
+        return bookingService.findBookingsByOwner(userId, state, from, size);
     }
 
     @GetMapping
     public List<BookingFinishDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") long userId,
                                                   @RequestParam(value = "state", required = false, defaultValue = "ALL")
-                                                          String state) {
-        return bookingService.getUserBookings(userId, state);
+                                                          String state,
+                                                  @RequestParam(value = "from", required = false, defaultValue = "0")
+                                                          int from,
+                                                  @RequestParam(value = "size", required = false, defaultValue = "10")
+                                                          int size) {
+        return bookingService.getUserBookings(userId, state, from, size);
     }
 }

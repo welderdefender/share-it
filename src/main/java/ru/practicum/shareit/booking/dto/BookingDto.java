@@ -7,8 +7,7 @@ import lombok.*;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @Builder
 public class BookingDto {

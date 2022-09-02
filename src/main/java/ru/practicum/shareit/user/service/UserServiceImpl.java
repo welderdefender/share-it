@@ -24,22 +24,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(UserDto user) {
-        User userDto = userRepository.save(UserMapper.toUser(user));
-        log.info("Пользователь с id {} добавлен", user.getId());
-        return UserMapper.userDto(userDto);
+    public UserDto create(UserDto userDto) {
+        User user = userRepository.save(UserMapper.toUser(userDto));
+        log.info("Пользователь с id {} добавлен", userDto.getId());
+        return UserMapper.userDto(user);
     }
 
     @Override
-    public UserDto update(long id, UserDto user) {
+    public UserDto update(long id, UserDto userDto) {
         User userToUpdate = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с таким id не найден"));
-        if (user.getEmail() != null) {
-            checkForEmailDuplication(user.getEmail());
-            userToUpdate.setEmail(user.getEmail());
+        if (userDto.getEmail() != null) {
+            checkForEmailDuplication(userDto.getEmail());
+            userToUpdate.setEmail(userDto.getEmail());
         }
-        if (user.getName() != null) {
-            userToUpdate.setName(user.getName());
+        if (userDto.getName() != null) {
+            userToUpdate.setName(userDto.getName());
         }
         userRepository.save(userToUpdate);
         log.info("Пользователь успешно обновлён!");

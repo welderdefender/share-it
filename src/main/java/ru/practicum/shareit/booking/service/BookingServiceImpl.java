@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.data.domain.*;
+import ru.practicum.shareit.pagination.Pagination;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingFinishDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -81,52 +83,60 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingFinishDto> findBookingsByOwner(long ownerId, String state) {
+    public List<BookingFinishDto> findBookingsByOwner(long ownerId, String state, int from, int size) {
         checkState(state);
-
         if (!itemRepository.existsByOwnerId(ownerId))
             throw new UserNotFoundException("У этого пользователя нет доступных вещей");
 
-        return getFilteredBookingsByState(bookingRepository.findBookingsByOwnerId(ownerId), State.valueOf(state));
+        Pageable sortedByStartDesc = Pagination.of(from, size, Sort.by("start").descending());
+        return getFilteredBookingsByStateAndOwnerId(ownerId, sortedByStartDesc, State.valueOf(state)).get()
+                .map(BookingMapper::toBookingFinishDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingFinishDto> getUserBookings(long userId, String state) {
+    public List<BookingFinishDto> getUserBookings(long userId, String state, int from, int size) {
         checkState(state);
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException("Пользователь с таким id не найден");
-        return getFilteredBookingsByState(bookingRepository.getBookingsByBookerIdOrderByStartDesc(userId),
-                State.valueOf(state));
-    }
-
-    private List<BookingFinishDto> getFilteredBookingsByState(List<Booking> bookings, State state) {
-        List<BookingFinishDto> bookingsDto = bookings.stream()
+        Pageable sortedByStartDesc = Pagination.of(from, size, Sort.by("start").descending());
+        return getFilteredBookingsByStateAndBookerId(userId, sortedByStartDesc, state).get()
                 .map(BookingMapper::toBookingFinishDto)
                 .collect(Collectors.toList());
-
-        if (state == State.ALL) return bookingsDto;
-
-        return bookingsDto.stream()
-                .filter(bookingFinishDto -> filterByState(bookingFinishDto, state))
-                .collect(Collectors.toList());
     }
 
-    private boolean filterByState(BookingFinishDto bookingFinishDto, State state) {
+    private Slice<Booking> getFilteredBookingsByStateAndOwnerId(long ownerId, Pageable pageable, State state) {
         switch (state.getState()) {
+            case "ALL":
+                return bookingRepository.findAllByOwnerId(ownerId, pageable);
             case "CURRENT":
-                return bookingFinishDto.getStart().isBefore(LocalDateTime.now())
-                        && bookingFinishDto.getEnd().isAfter(LocalDateTime.now());
-            case "PAST":
-                return bookingFinishDto.getEnd().isBefore(LocalDateTime.now());
+                return bookingRepository.findAllCurrentByOwnerId(ownerId, LocalDateTime.now(), pageable);
             case "FUTURE":
-                return bookingFinishDto.getStart().isAfter(LocalDateTime.now());
+                return bookingRepository.findAllFutureByOwnerId(ownerId, LocalDateTime.now(), pageable);
+            case "PAST":
+                return bookingRepository.getAllPastByOwnerId(ownerId, LocalDateTime.now(), pageable);
             default:
-                return Objects.equals(bookingFinishDto.getStatus(), state.getState());
+                return bookingRepository.findAllByOwnerIdAndStatus(ownerId, Status.valueOf(state.getState()), pageable);
         }
     }
 
     private void checkState(String state) {
         if (Arrays.stream(State.values()).noneMatch(element -> Objects.equals(element.getState(), state)))
             throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
+    }
+
+    private Slice<Booking> getFilteredBookingsByStateAndBookerId(long bookerId, Pageable pageable, String state) {
+        switch (state) {
+            case "ALL":
+                return bookingRepository.getAllByBookerId(bookerId, pageable);
+            case "CURRENT":
+                return bookingRepository.findAllByBookerId(bookerId, LocalDateTime.now(), pageable);
+            case "FUTURE":
+                return bookingRepository.findAllByBookerIdAndStartAfter(bookerId, LocalDateTime.now(), pageable);
+            case "PAST":
+                return bookingRepository.findAllByBookerIdAndEndBefore(bookerId, LocalDateTime.now(), pageable);
+            default:
+                return bookingRepository.findAllByBookerIdAndStatus(bookerId, Status.valueOf(state), pageable);
+        }
     }
 }

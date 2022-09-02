@@ -4,7 +4,6 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.dto.ItemDtoWithComments;
-import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
@@ -15,9 +14,9 @@ public interface ItemService {
 
     ItemDtoWithComments findById(long userId, long itemId);
 
-    List<ItemDto> searchText(String text);
+    List<ItemDto> searchText(String text, int from, int size);
 
-    List<ItemDtoWithBookings> findByOwner(long userId);
+    List<ItemDtoWithBookings> findByOwner(long userId, int from, int size);
 
     CommentDto createComment(CommentDto commentDto, long userId, long itemId);
 }

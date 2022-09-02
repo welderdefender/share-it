@@ -1,4 +1,4 @@
-package ru.practicum.shareit.requests;
+package ru.practicum.shareit.requests.model;
 
 import java.time.LocalDateTime;
 
@@ -16,21 +16,21 @@ import javax.persistence.*;
 @Builder
 @Data
 @Entity
-@Table(name = "item_requests")
-public class ItemRequest {
+@Table(name = "item_request")
+public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "request_id")
     private Long id;
 
-    @Column(name = "description")
+    @Column(name = "request_description")
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "requester")
-    private User requester;
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "created")
+    @Column(name = "creation_time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd, hh:mm:ss")
-    private LocalDateTime created;
+    private LocalDateTime creationTime;
 }

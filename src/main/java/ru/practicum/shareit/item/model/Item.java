@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.requests.ItemRequest;
+import ru.practicum.shareit.requests.model.Request;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -19,30 +19,30 @@ import lombok.*;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "item_id")
     private Long id;
 
     @NotNull(message = "Имя не может быть null")
     @NotBlank(message = "Имя не может быть пустым")
-    @Column(name = "name", nullable = false)
+    @Column(name = "item_name", nullable = false)
     private String name;
 
     @NotNull(message = "Описание не может быть null")
     @NotBlank(message = "Описание не может быть пустым")
-    @Column(name = "description", nullable = false)
+    @Column(name = "item_description", nullable = false)
     private String description;
 
     @NotNull(message = "Доступность не может быть null")
-    @Column(name = "available", nullable = false)
+    @Column(name = "is_available", nullable = false)
     private Boolean available;
 
     @ManyToOne
-    @JoinColumn(name = "owner")
+    @JoinColumn(name = "owner_id")
     private User owner;
 
     @ManyToOne
-    @JoinColumn(name = "request")
-    private ItemRequest itemRequest;
+    @JoinColumn(name = "request_id")
+    private Request request;
 
     @JsonProperty("id")
     public Long getId() {

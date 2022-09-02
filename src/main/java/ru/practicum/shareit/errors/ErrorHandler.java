@@ -56,4 +56,16 @@ public class ErrorHandler {
     public ErrorResponse handleNoAccessException(final NoAccessException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleRequestNotFoundException(final RequestNotFoundException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalPaginationException(final IllegalPaginationException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }

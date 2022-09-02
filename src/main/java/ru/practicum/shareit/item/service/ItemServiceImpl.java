@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -10,6 +11,9 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.pagination.Pagination;
+import ru.practicum.shareit.requests.model.Request;
+import ru.practicum.shareit.requests.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -25,13 +29,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ItemServiceImpl implements ItemService {
+    private final RequestRepository requestRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
+    public ItemServiceImpl(RequestRepository requestRepository, ItemRepository itemRepository,
+                           UserRepository userRepository,
                            CommentRepository commentRepository, BookingRepository bookingRepository) {
+        this.requestRepository = requestRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
@@ -43,6 +50,12 @@ public class ItemServiceImpl implements ItemService {
         checkIfUserExists(userId);
         Item item = ItemMapper.toItem(itemDto, userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с таким id не найден")));
+        if (itemDto.getRequestId() != null) {
+            Request request = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new RequestNotFoundException(String.format("Request with id=%s not found",
+                            itemDto.getRequestId())));
+            item.setRequest(request);
+        }
         itemRepository.save(item);
         log.info("Пользователь {} добавил новую вещь с id {}", userId, item.getId());
         return ItemMapper.toItemDto(item);
@@ -79,9 +92,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoWithBookings> findByOwner(long userId) {
-        return itemRepository.findItemsByOwnerId(userId).stream()
-                .map(item -> getItemWithBooking(item.getId()))
+    public List<ItemDtoWithBookings> findByOwner(long userId, int from, int size) {
+        Pageable pageable = Pagination.of(from, size);
+        return itemRepository.findItemsByOwnerId(userId, pageable).get()
+                .map(item -> ItemMapper.toItemDtoWithBookings(item, getLastBooking(item.getId()),
+                        getNextBooking(item.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -92,9 +107,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchText(String text) {
+    public List<ItemDto> searchText(String text, int from, int size) {
         if (text.isBlank() || text.isEmpty()) return new ArrayList<>();
-        return itemRepository.searchText(text).stream()
+        Pageable pageable = Pagination.of(from, size);
+        return itemRepository.searchText(text, pageable).get()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
