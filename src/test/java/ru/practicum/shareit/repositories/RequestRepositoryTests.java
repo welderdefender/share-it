@@ -25,42 +25,6 @@ class RequestRepositoryTests {
     private TestEntityManager tem;
 
     @Test
-    void findAllByUserIdOrderByCreationTimeDesc() {
-        User author = User.builder()
-                .name("Дарья")
-                .email("darya@hotmail.com")
-                .build();
-        User another = User.builder()
-                .name("Мария")
-                .email("maria@hotmail.com")
-                .build();
-        Request one = Request.builder()
-                .user(author)
-                .description("Описание1")
-                .creationTime(LocalDateTime.now())
-                .build();
-        Request two = Request.builder()
-                .user(another)
-                .description("Описание2")
-                .creationTime(LocalDateTime.now())
-                .build();
-        Request three = Request.builder()
-                .user(author)
-                .description("Описание3")
-                .creationTime(LocalDateTime.now())
-                .build();
-
-        tem.persist(author);
-        tem.persist(another);
-        tem.persist(one);
-        tem.persist(two);
-        tem.persist(three);
-        List<Request> requestsList = requestRepository.findAllByUserIdOrderByCreationTimeDesc(author.getId());
-        assertEquals(2, requestsList.size());
-        assertThat(requestsList.get(1), equalTo(three));
-    }
-
-    @Test
     void findOtherUsersRequests() {
         User author = User.builder()
                 .name("Дарья")
