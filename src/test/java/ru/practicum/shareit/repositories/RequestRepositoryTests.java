@@ -57,7 +57,7 @@ class RequestRepositoryTests {
         tem.persist(three);
         List<Request> requestsList = requestRepository.findAllByUserIdOrderByCreationTimeDesc(author.getId());
         assertEquals(2, requestsList.size());
-        assertThat(requestsList.get(0), equalTo(one));
+        assertThat(requestsList.get(2), equalTo(one));
         assertThat(requestsList.get(1), equalTo(three));
     }
 

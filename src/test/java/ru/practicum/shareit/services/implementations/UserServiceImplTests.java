@@ -72,9 +72,9 @@ class UserServiceImplTests {
     @Test
     void delete() {
         UserDto userToSave = userService.create(userDto);
-        assertThat(userToSave.getId(), equalTo(2L));
-        userService.remove(2L);
-        User user = tem.find(User.class, 2L);
+        assertThat(userToSave.getId(), equalTo(17L));
+        userService.remove(17L);
+        User user = tem.find(User.class, 17L);
         assertNull(user);
     }
 
