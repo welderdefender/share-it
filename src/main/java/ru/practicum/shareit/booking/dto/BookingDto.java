@@ -12,8 +12,6 @@ import javax.persistence.ManyToOne;
 @Builder
 public class BookingDto {
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "booker_id")
     private Long bookerId;
     private LocalDateTime start;
     private LocalDateTime end;

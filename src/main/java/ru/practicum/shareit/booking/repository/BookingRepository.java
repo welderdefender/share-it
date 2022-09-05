@@ -4,7 +4,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -12,7 +11,6 @@ import ru.practicum.shareit.booking.model.Status;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-@EnableJpaRepositories
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> getTopByItem_IdAndBooker_IdOrderByEndAsc(long itemId, long bookerId);
 
