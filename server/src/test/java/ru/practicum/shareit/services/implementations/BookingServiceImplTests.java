@@ -473,4 +473,76 @@ class BookingServiceImplTests {
         assertThat(bookerBookingsList.get(0), equalTo(first));
         assertThat(bookerBookingsList.get(0).getStatus(), equalTo(Status.WAITING.name()));
     }
+
+    @Test
+    void getDeclinedBookingsByOwner() {
+        UserDto owner = userService.create(userDtoItemOwner);
+        ItemDto item = itemService.create(owner.getId(), itemDto);
+        UserDto booker = userService.create(userDtoBooker);
+        bookingStartDto.setItemId(item.getId());
+        UserDto bookerTwo = UserDto.builder()
+                .name("Юрий")
+                .email("yuri@ya.ru")
+                .build();
+        UserDto returnedBooker = userService.create(bookerTwo);
+        BookingStartDto anotherBooking = BookingStartDto.builder()
+                .itemId(item.getId())
+                .bookerId(returnedBooker.getId())
+                .start(LocalDateTime.now().plusDays(2))
+                .end(LocalDateTime.now().plusDays(3))
+                .build();
+        BookingStartDto bookingByBooker = BookingStartDto.builder()
+                .itemId(item.getId())
+                .bookerId(booker.getId())
+                .start(LocalDateTime.now().plusDays(3))
+                .end(LocalDateTime.now().plusDays(4))
+                .build();
+
+        bookingService.create(booker.getId(), bookingStartDto);
+        bookingService.create(returnedBooker.getId(), anotherBooking);
+        BookingFinishDto second = bookingService.create(booker.getId(), bookingByBooker);
+        BookingFinishDto updatedToDecline = bookingService.update(owner.getId(), second.getId(), false);
+        List<BookingFinishDto> bookerBookingsList = bookingService.findBookingsByOwner(owner.getId(), "REJECTED", 0,
+                10);
+        assertThat(bookerBookingsList.size(), equalTo(1));
+        assertThat(bookerBookingsList.get(0).getItem().getOwner(), equalTo(UserMapper.toUser(owner)));
+        assertThat(bookerBookingsList.get(0), equalTo(updatedToDecline));
+        assertThat(bookerBookingsList.get(0).getStatus(), equalTo(Status.REJECTED.name()));
+    }
+
+    @Test
+    void getWaitingBookingsByOwner() {
+        UserDto owner = userService.create(userDtoItemOwner);
+        ItemDto item = itemService.create(owner.getId(), itemDto);
+        UserDto booker = userService.create(userDtoBooker);
+        bookingStartDto.setItemId(item.getId());
+        UserDto bookerTwo = UserDto.builder()
+                .name("Юрий")
+                .email("yuri@ya.ru")
+                .build();
+        UserDto returnedAnotherBooker = userService.create(bookerTwo);
+        BookingStartDto bookingTwo = BookingStartDto.builder()
+                .itemId(item.getId())
+                .bookerId(returnedAnotherBooker.getId())
+                .start(LocalDateTime.now().plusDays(2))
+                .end(LocalDateTime.now().plusDays(3))
+                .build();
+        BookingStartDto bookingByBooker = BookingStartDto.builder()
+                .itemId(item.getId())
+                .bookerId(booker.getId())
+                .start(LocalDateTime.now().plusDays(3))
+                .end(LocalDateTime.now().plusDays(4))
+                .build();
+
+        BookingFinishDto firstBooking = bookingService.create(booker.getId(), bookingStartDto);
+        BookingFinishDto secondBooking = bookingService.create(returnedAnotherBooker.getId(), bookingTwo);
+        BookingFinishDto thirdBooking = bookingService.create(booker.getId(), bookingByBooker);
+        bookingService.update(owner.getId(), firstBooking.getId(), true);
+        bookingService.update(owner.getId(), thirdBooking.getId(), true);
+        List<BookingFinishDto> bookerBookingsList = bookingService.findBookingsByOwner(owner.getId(), "WAITING", 0, 10);
+        assertThat(bookerBookingsList.size(), equalTo(1));
+        assertThat(bookerBookingsList.get(0).getItem().getOwner(), equalTo(UserMapper.toUser(owner)));
+        assertThat(bookerBookingsList.get(0), equalTo(secondBooking));
+        assertThat(bookerBookingsList.get(0).getStatus(), equalTo(Status.WAITING.name()));
+    }
 }

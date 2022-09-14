@@ -643,4 +643,56 @@ class BookingServiceTests {
         Mockito.verify(bookingRepository, Mockito.never())
                 .findAllByOwnerIdAndStatus(Mockito.anyLong(), Mockito.any(), Mockito.any(Pageable.class));
     }
+
+    @Test
+    void ifBookingsOfOwnerFoundWithRejectedStateThenFindAllByBookerIdAndStartAfterBookingRepository() {
+        Pageable pageable = Pagination.of(0, 10, Sort.by("start").descending());
+        Slice<Booking> bookings = new SliceImpl<>(List.of(booking));
+        Mockito.when(itemRepository.existsByOwnerId(1L))
+                .thenReturn(true);
+        Mockito.when(bookingRepository.findAllByOwnerIdAndStatus(1L, Status.REJECTED, pageable))
+                .thenReturn(bookings);
+
+        bookingService.findBookingsByOwner(1L, "REJECTED", 0, 10);
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .existsByOwnerId(Mockito.anyLong());
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByOwnerIdAndStatus(1L, Status.REJECTED, pageable);
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findAllByOwnerId(Mockito.anyLong(), Mockito.any(Pageable.class));
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findAllCurrentByOwnerId(Mockito.anyLong(), Mockito.any(LocalDateTime.class),
+                        Mockito.any(Pageable.class));
+        Mockito.verify(bookingRepository, Mockito.never())
+                .getAllPastByOwnerId(Mockito.anyLong(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findAllFutureByOwnerId(Mockito.anyLong(), Mockito.any(LocalDateTime.class),
+                        Mockito.any(Pageable.class));
+    }
+
+    @Test
+    void ifBookingsOfOwnerFoundWithWaitingStateThenFindAllByBookerIdAndStartAfterBookingRepository() {
+        Pageable pageable = Pagination.of(0, 10, Sort.by("start").descending());
+        Slice<Booking> bookings = new SliceImpl<>(List.of(booking));
+        Mockito.when(itemRepository.existsByOwnerId(1L))
+                .thenReturn(true);
+        Mockito.when(bookingRepository.findAllByOwnerIdAndStatus(1L, Status.WAITING, pageable))
+                .thenReturn(bookings);
+
+        bookingService.findBookingsByOwner(1L, "WAITING", 0, 10);
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .existsByOwnerId(Mockito.anyLong());
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByOwnerIdAndStatus(1L, Status.WAITING, pageable);
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findAllByOwnerId(Mockito.anyLong(), Mockito.any(Pageable.class));
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findAllCurrentByOwnerId(Mockito.anyLong(), Mockito.any(LocalDateTime.class),
+                        Mockito.any(Pageable.class));
+        Mockito.verify(bookingRepository, Mockito.never())
+                .getAllPastByOwnerId(Mockito.anyLong(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findAllFutureByOwnerId(Mockito.anyLong(), Mockito.any(LocalDateTime.class),
+                        Mockito.any(Pageable.class));
+    }
 }

@@ -10,12 +10,6 @@ import ru.practicum.shareit.errors.exceptions.*;
 public class ErrorHandler {
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleItemNotFoundException(final ItemNotFoundException e) {
         return new ErrorResponse(e.getMessage());
@@ -30,12 +24,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDuplicateEmailException(final DuplicateEmailException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNullEmailException(final NullEmailException e) {
         return new ErrorResponse(e.getMessage());
     }
 

@@ -12,9 +12,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.errors.exceptions.BadRequestException;
-import ru.practicum.shareit.errors.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.errors.exceptions.UserNotFoundException;
+import ru.practicum.shareit.errors.exceptions.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -22,6 +20,7 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.pagination.Pagination;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -311,4 +310,53 @@ class ItemServiceTests {
         Mockito.verify(itemRepository, Mockito.times(1))
                 .searchText(Mockito.anyString(), Mockito.any(Pageable.class));
     }
-} 
+
+    @Test
+    void ifCommentPostedOnCurrentBookingThenInvalidRequestException() {
+        Booking current = Booking.builder().end(LocalDateTime.now().plusDays(1L)).build();
+        Mockito.when(userRepository.findById(1L))
+                .thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(1L))
+                .thenReturn(Optional.of(item));
+        Mockito.when(bookingRepository.getTopByItem_IdAndBooker_IdOrderByEndAsc(1L, 1L))
+                .thenReturn(Optional.of(current));
+
+        final BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> itemService.createComment(comment, 1L, 1L));
+
+        assertEquals("Этот пользователь не может оставить комментарий",
+                exception.getMessage());
+
+        Mockito.verify(userRepository, Mockito.times(1))
+                .findById(Mockito.anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .findById(Mockito.anyLong());
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .getTopByItem_IdAndBooker_IdOrderByEndAsc(Mockito.anyLong(), Mockito.anyLong());
+        Mockito.verify(commentRepository, Mockito.never())
+                .save(Mockito.any());
+    }
+
+    @Test
+    void ifUpdatedByNotOwnerThenNoAccessException() {
+        User randomGuy = User.builder().id(5L).build();
+        Item item = Item.builder().id(1L).owner(randomGuy).build();
+        Mockito.when(userRepository.existsById(1L))
+                .thenReturn(true);
+        Mockito.when(itemRepository.findById(1L))
+                .thenReturn(Optional.of(item));
+
+        final NoAccessException exception = assertThrows(
+                NoAccessException.class,
+                () -> itemService.update(1L, 1L, itemDto));
+
+        assertEquals("У пользователя нет доступа к этой вещи", exception.getMessage());
+        Mockito.verify(userRepository, Mockito.times(1))
+                .existsById(Mockito.anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .findById(Mockito.anyLong());
+        Mockito.verify(itemRepository, Mockito.never())
+                .save(Mockito.any());
+    }
+}
