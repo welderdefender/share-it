@@ -14,9 +14,9 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class BookingRepositoryTests {

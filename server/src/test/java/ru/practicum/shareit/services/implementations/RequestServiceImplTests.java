@@ -18,7 +18,6 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;

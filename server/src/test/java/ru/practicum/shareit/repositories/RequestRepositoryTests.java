@@ -8,14 +8,13 @@ import org.springframework.data.domain.Slice;
 import ru.practicum.shareit.pagination.Pagination;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
-
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class RequestRepositoryTests {

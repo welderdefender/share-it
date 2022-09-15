@@ -1,9 +1,7 @@
 package ru.practicum.shareit.booking.model;
 
 import org.springframework.core.convert.converter.Converter;
-
 import org.springframework.stereotype.Component;
-
 import ru.practicum.shareit.errors.exceptions.BadRequestException;
 
 @Component

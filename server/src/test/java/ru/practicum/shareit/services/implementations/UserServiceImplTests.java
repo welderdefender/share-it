@@ -12,13 +12,12 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Transactional
 @SpringBootTest(

@@ -1,20 +1,22 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingFinishDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingStartDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.pagination.Pagination;
-import org.springframework.stereotype.Service;
 import ru.practicum.shareit.errors.exceptions.BadRequestException;
 import ru.practicum.shareit.errors.exceptions.BookingNotFoundException;
 import ru.practicum.shareit.errors.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.errors.exceptions.UserNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.pagination.Pagination;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
